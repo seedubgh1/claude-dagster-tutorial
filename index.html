@@ -527,31 +527,43 @@
       <span class="badge beginner">Beginner</span>
       <h1>Environment Setup</h1>
       <p class="subtitle">// get Dagster and Claude Code ready</p>
-      <h2>1. Install Dagster</h2>
-      <pre><button class="copy-btn" onclick="copyCode(this)">copy</button><span class="cm"># Create a virtual environment</span>
-python -m venv .venv
-source .venv/bin/activate  <span class="cm"># Windows: .venv\Scripts\activate</span>
+      <p>We use <strong>uv</strong> — a fast Python package and project manager written in Rust. It replaces <code>pip</code>, <code>venv</code>, and <code>pip-tools</code> in a single tool and is significantly faster than any of them.</p>
+      <h2>1. Install uv</h2>
+      <pre><button class="copy-btn" onclick="copyCode(this)">copy</button><span class="cm"># macOS / Linux</span>
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-<span class="cm"># Install Dagster + web UI + pandas</span>
-pip install dagster dagster-webserver pandas requests</pre>
+<span class="cm"># Windows (PowerShell)</span>
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+<span class="cm"># Or via pip if you already have Python</span>
+pip install uv</pre>
+      <div class="callout tip"><strong>Why uv?</strong> Dependency resolution and installs are 10–100× faster than pip. It also manages Python versions, lockfiles, and virtual environments — no separate <code>pyenv</code> or <code>venv</code> needed.</div>
       <h2>2. Install Claude Code CLI</h2>
       <pre><button class="copy-btn" onclick="copyCode(this)">copy</button>npm install -g @anthropic-ai/claude-code</pre>
       <h2>3. Scaffold a project</h2>
-      <pre><button class="copy-btn" onclick="copyCode(this)">copy</button>dagster project scaffold --name my_pipeline
-cd my_pipeline</pre>
-      <p>This creates the standard project layout:</p>
+      <pre><button class="copy-btn" onclick="copyCode(this)">copy</button><span class="cm"># Create and enter your project directory</span>
+uv init my_pipeline
+cd my_pipeline
+
+<span class="cm"># Add Dagster and dependencies (uv creates .venv automatically)</span>
+uv add dagster dagster-webserver pandas requests
+
+<span class="cm"># Scaffold the Dagster project structure inside it</span>
+uv run dagster project scaffold --name my_pipeline</pre>
+      <p>uv creates a <code>.venv</code> automatically and writes a <code>uv.lock</code> lockfile — no manual activate needed for most commands. The project layout will look like:</p>
       <pre><button class="copy-btn" onclick="copyCode(this)">copy</button>my_pipeline/
 ├── my_pipeline/
-│   ├── __init__.py       <span class="cm"># Definitions entry point</span>
-│   ├── assets.py         <span class="cm"># Your asset functions</span>
-│   └── resources.py      <span class="cm"># Shared resources</span>
+│   ├── __init__.py       # Definitions entry point
+│   ├── assets.py         # Your asset functions
+│   └── resources.py      # Shared resources
 ├── my_pipeline_tests/
-├── pyproject.toml
-└── setup.py</pre>
+├── pyproject.toml        # deps declared here (no setup.py needed)
+└── uv.lock               # exact pinned versions, commit this</pre>
       <h2>4. Launch the UI</h2>
-      <pre><button class="copy-btn" onclick="copyCode(this)">copy</button>dagster dev</pre>
+      <pre><button class="copy-btn" onclick="copyCode(this)">copy</button>uv run dagster dev</pre>
       <p>Open <code>http://localhost:3000</code> in your browser. You'll see the Dagster UI with your empty project ready to go.</p>
-      <div class="callout tip"><strong>Tip:</strong> Keep <code>dagster dev</code> running in one terminal and open Claude Code in another — you'll see your pipeline update in real-time as Claude generates code.</div>
+      <div class="callout note"><strong>Adding packages later:</strong> Use <code>uv add &lt;package&gt;</code> instead of <code>pip install</code>. This updates both <code>pyproject.toml</code> and <code>uv.lock</code> atomically.</div>
+      <div class="callout tip"><strong>Tip:</strong> Keep <code>uv run dagster dev</code> running in one terminal and open Claude Code in another — your pipeline updates in real-time as Claude generates code.</div>
       <div class="nav-buttons">
         <button class="btn" onclick="goTo(1)">← Previous</button>
         <button class="btn primary" onclick="goTo(3)">First Asset →</button>
@@ -906,7 +918,7 @@ Also update __init__.py to include the new asset."</pre>
         <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Apply the fix and re-materialize</strong><p>Dagster auto-reloads on file save — just click Materialize again in the UI.</p></div></div>
         <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Check metadata in the UI</strong><p>After a successful run, review the metadata panel to confirm data quality looks right.</p></div></div>
       </div>
-      <div class="callout tip"><strong>Tip:</strong> Run <code>DAGSTER_HOME=~/.dagster dagster dev</code> to persist run history between sessions. Compare metadata from today vs yesterday to catch regressions early.</div>
+      <div class="callout tip"><strong>Tip:</strong> Run <code>DAGSTER_HOME=~/.dagster uv run dagster dev</code> to persist run history between sessions. Compare metadata from today vs yesterday to catch regressions early.</div>
       <div class="callout note" style="margin-top:14px"><strong>Tutorial complete!</strong> Use the sidebar to revisit any section. Next steps: explore Dagster partitions, dbt integration, or ask Claude Code to generate the full project scaffold.</div>
       <div class="nav-buttons">
         <button class="btn" onclick="goTo(10)">← Previous</button>
