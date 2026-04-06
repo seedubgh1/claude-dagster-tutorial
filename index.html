@@ -559,9 +559,16 @@ uv run dagster project scaffold --name my_pipeline</pre>
 ├── my_pipeline_tests/
 ├── pyproject.toml        # deps declared here (no setup.py needed)
 └── uv.lock               # exact pinned versions, commit this</pre>
-      <h2>4. Launch the UI</h2>
+      <h2>4. Configure Dagster</h2>
+      <p>Dagster needs to know where your definitions live. Add a <code>[tool.dagster]</code> block to your <code>pyproject.toml</code>:</p>
+      <pre><button class="copy-btn" onclick="copyCode(this)">copy</button># pyproject.toml  (add this block at the bottom)
+[tool.dagster]
+module_name = "my_pipeline"</pre>
+      <p>This tells <code>dagster dev</code> which Python module contains your <code>Definitions</code> object. Without it you'll see: <em>No arguments given and no [tool.dagster] block found.</em></p>
+      <h2>5. Launch the UI</h2>
       <pre><button class="copy-btn" onclick="copyCode(this)">copy</button>uv run dagster dev</pre>
       <p>Open <code>http://localhost:3000</code> in your browser. You'll see the Dagster UI with your empty project ready to go.</p>
+      <div class="callout tip"><strong>Alternative:</strong> Skip editing <code>pyproject.toml</code> and pass the module directly instead: <code>uv run dagster dev -m my_pipeline</code></div>
       <div class="callout note"><strong>Adding packages later:</strong> Use <code>uv add &lt;package&gt;</code> instead of <code>pip install</code>. This updates both <code>pyproject.toml</code> and <code>uv.lock</code> atomically.</div>
       <div class="callout tip"><strong>Tip:</strong> Keep <code>uv run dagster dev</code> running in one terminal and open Claude Code in another — your pipeline updates in real-time as Claude generates code.</div>
       <div class="nav-buttons">
