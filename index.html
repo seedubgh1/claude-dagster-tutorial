@@ -553,12 +553,13 @@ uv run dagster project scaffold --name my_pipeline</pre>
       <p>uv creates a <code>.venv</code> automatically and writes a <code>uv.lock</code> lockfile — no manual activate needed for most commands. The project layout will look like:</p>
       <pre><button class="copy-btn" onclick="copyCode(this)">copy</button>my_pipeline/
 ├── my_pipeline/
-│   ├── __init__.py       # Definitions entry point
-│   ├── assets.py         # Your asset functions
-│   └── resources.py      # Shared resources
+│   ├── __init__.py       # minimal package init
+│   ├── assets.py         # your asset functions
+│   └── definitions.py    # Definitions object lives here
 ├── my_pipeline_tests/
 ├── pyproject.toml        # deps declared here (no setup.py needed)
 └── uv.lock               # exact pinned versions, commit this</pre>
+      <p>Note: newer Dagster scaffolding uses <code>definitions.py</code> as the entry point instead of <code>__init__.py</code>. You'll also create a <code>resources.py</code> yourself later when you need shared resources.</p>
       <h2>4. Configure Dagster</h2>
       <p>Dagster needs to know where your definitions live. Add a <code>[tool.dagster]</code> block to your <code>pyproject.toml</code>:</p>
       <pre><button class="copy-btn" onclick="copyCode(this)">copy</button># pyproject.toml  (add this block at the bottom)
@@ -595,13 +596,15 @@ module_name = "my_pipeline"</pre>
     print(message)
     <span class="kw">return</span> message</pre>
       <h2>Register it</h2>
-      <pre><button class="copy-btn" onclick="copyCode(this)">copy</button><span class="cm"># my_pipeline/__init__.py</span>
+      <p>Open <code>definitions.py</code> — this is where your <code>Definitions</code> object lives. Update it to include your new asset:</p>
+      <pre><button class="copy-btn" onclick="copyCode(this)">copy</button><span class="cm"># my_pipeline/definitions.py</span>
 <span class="kw">from</span> dagster <span class="kw">import</span> Definitions, load_assets_from_modules
 <span class="kw">from</span> . <span class="kw">import</span> assets
 
 defs = Definitions(
     assets=load_assets_from_modules([assets])
 )</pre>
+      <p>The scaffold may already have generated this file for you with a placeholder asset. If so, just ensure <code>load_assets_from_modules([assets])</code> is wired up and you're good.</p>
       <h2>Or — ask Claude Code to write it</h2>
       <div class="prompt-block">
         <div class="label">Claude Code prompt</div>
